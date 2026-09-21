@@ -9,16 +9,17 @@
   <meta name="description" content="Una flor amarilla que viajó desde Panamá hasta México, solo para ti.">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Una flor para ti 🌻">
+  <meta property="og:title" content="Una flor para ti 💛">
   <meta property="og:description" content="Viajó desde Panamá hasta México, solo para ti.">
-  <meta property="og:image" content="https://ralexdg.github.io/flor-amarilla/og.jpg">
+  <!-- Vista previa: og-tulipan.jpg (T) u og-girasol.jpg (G) -->
+  <meta property="og:image" content="https://ralexdg.github.io/flor-amarilla/og-tulipan.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
 
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-tulipan.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/great-vibes.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 
@@ -27,10 +28,18 @@
   <!-- Fondo: atardecer -->
   <div class="scene" aria-hidden="true">
     <div class="sky"></div>
-    <div class="sun"></div>
+    <div class="sun">
+      <div class="rays"></div>
+      <div class="halo"></div>
+      <div class="disc"></div>
+    </div>
     <div class="cloud c1"></div>
     <div class="cloud c2"></div>
     <div class="cloud c3"></div>
+    <div class="cloud c4"></div>
+    <svg class="bird b1" viewBox="0 0 20 8"><path d="M0,6 Q5,0 10,6 Q15,0 20,6"/></svg>
+    <svg class="bird b2" viewBox="0 0 20 8"><path d="M0,6 Q5,0 10,6 Q15,0 20,6"/></svg>
+    <svg class="bird b3" viewBox="0 0 20 8"><path d="M0,6 Q5,0 10,6 Q15,0 20,6"/></svg>
     <svg class="hills hills-far" viewBox="0 0 1440 300" preserveAspectRatio="none">
       <path d="M0,150 C180,90 340,130 540,120 S900,70 1120,115 S1360,120 1440,95 V300 H0Z" fill="#a24a72"/>
     </svg>
@@ -113,13 +122,14 @@
 
     <p class="intro-line">Una flor viajó desde Panamá hasta ti</p>
     <button id="open" class="open-btn" type="button">Abrir</button>
-    <p class="intro-hint">con un suave sonido ambiente ♪</p>
+    <p class="intro-hint">con música de piano ♪</p>
   </div>
 </div>
 
-<script src="js/audio.js?v=5" defer></script>
-<script src="js/flower.js?v=5" defer></script>
-<script src="js/fx.js?v=5" defer></script>
-<script src="js/main.js?v=5" defer></script>
+<script src="js/config.js?v=6" defer></script>
+<script src="js/audio.js?v=6" defer></script>
+<script src="js/flower.js?v=6" defer></script>
+<script src="js/fx.js?v=6" defer></script>
+<script src="js/main.js?v=6" defer></script>
 </body>
 </html>

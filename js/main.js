@@ -37,7 +37,10 @@
   document.addEventListener('visibilitychange', tick); // al volver a la pestaña, se pone al día al instante
 
   // ---- Flor ----
-  Flor.flower.build($('flower'));
+  // El tipo de flor ('T' tulipán / 'G' girasol) se elige en js/config.js.
+  const type = Flor.flower.build($('flower'), (window.FLOR_CONFIG || {}).flower);
+  const icon = document.querySelector('link[rel="icon"]');
+  if (icon && type === 'T') icon.setAttribute('href', 'favicon-tulipan.svg');
 
   // ---- Apertura ----
   const intro = $('intro');
@@ -63,7 +66,7 @@
 
     // Destello cuando termina de florecer.
     setTimeout(() => {
-      const c = Flor.fx.centerOf(document.querySelector('#flower .center'));
+      const c = Flor.fx.centerOf(document.querySelector('#flower .head'));
       Flor.fx.burst(c.x, c.y, 36);
       Flor.fx.startPetals();
     }, 4300);
