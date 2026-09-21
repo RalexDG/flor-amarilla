@@ -4,12 +4,14 @@
   const $ = (id) => document.getElementById(id);
   const Flor = window.Flor;
 
-  // ---- Fecha de inicio del contador (hora local de quien abre la página) ----
-  const START = new Date(2025, 7, 7, 0, 0, 0); // 7 de agosto de 2025
+  // ---- Contador ----
+  // Inicio: 7 de agosto de 2025, 00:00 hora de Panamá (UTC-5), igual para todos los dispositivos.
+  const START = new Date('2025-08-07T00:00:00-05:00').getTime();
 
-  // Tiempo transcurrido en días totales, horas, minutos y segundos.
-  function elapsed(from, to) {
-    let rest = Math.max(0, to - from);
+  // Todo el tiempo transcurrido (años y meses incluidos) expresado en días,
+  // más las horas, minutos y segundos sobrantes.
+  function elapsed(now) {
+    let rest = Math.max(0, now - START);
     const d = Math.floor(rest / 864e5); rest -= d * 864e5;
     const h = Math.floor(rest / 36e5);  rest -= h * 36e5;
     const mi = Math.floor(rest / 6e4);  rest -= mi * 6e4;
@@ -18,15 +20,21 @@
 
   const cache = {};
   function put(id, val) {
-    if (cache[id] !== val) { cache[id] = val; $(id).textContent = val; }
+    const el = $(id);
+    if (el && cache[id] !== val) { cache[id] = val; el.textContent = val; }
   }
   const pad = (n) => String(n).padStart(2, '0');
 
   function tick() {
-    const t = elapsed(START, new Date());
+    const t = elapsed(Date.now());
     put('t-d', t.d);  put('l-d', t.d === 1 ? 'día' : 'días');
     put('t-h', pad(t.h)); put('t-mi', pad(t.mi)); put('t-s', pad(t.s));
   }
+
+  // El contador arranca primero: no depende de que lo demás cargue bien.
+  tick();
+  setInterval(tick, 1000);
+  document.addEventListener('visibilitychange', tick); // al volver a la pestaña, se pone al día al instante
 
   // ---- Flor ----
   Flor.flower.build($('flower'));
@@ -66,7 +74,4 @@
 
   // ?skip abre directo (útil para probar el diseño sin la bienvenida).
   if (/[?&]skip\b/.test(location.search)) open(false);
-
-  tick();
-  setInterval(tick, 1000);
 })();

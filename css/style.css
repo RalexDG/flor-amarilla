@@ -291,6 +291,26 @@ body:not(.open) .glow { visibility: hidden; }
   .from { font-size: 1.5rem; }
 }
 
+/* ---------- Móvil en horizontal: flor a la izquierda, texto y contador a la derecha ---------- */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --hill: clamp(120px, 38dvh, 170px); }
+  .stage { min-height: 0; }
+  .content {
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr auto;
+    column-gap: 8px;
+  }
+  .flower-wrap { grid-column: 1; grid-row: 1 / 4; margin-bottom: 0; }
+  .phrase { grid-column: 2; grid-row: 1; padding: 12px 58px 0 8px; }
+  .sign { grid-column: 2; grid-row: 3; margin-top: 0; padding: 0 20px 10px 8px; }
+  .phrase h1 { font-size: clamp(1.5rem, 3.6vw, 2.3rem); }
+  .love, .from { font-size: 1.5rem; }
+  .since { font-size: .82rem; margin: 0 0 4px; }
+  .timer { width: min(100%, 300px); padding: 5px 2px 4px; }
+  .num { font-size: 1.4rem; }
+  .lbl { font-size: .68rem; margin-top: 2px; }
+  .sound { top: 8px; right: 8px; }
+}
+
 /* ---------- Movimiento reducido ---------- */
 @media (prefers-reduced-motion: reduce) {
   .plant, .head, .leaf, .glow, .sun, .cloud { animation: none !important; }
