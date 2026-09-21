@@ -367,3 +367,7 @@ body:not(.open) .glow { visibility: hidden; }
   .bird { display: none; }
   .open-btn { animation: rise .01s 0s forwards !important; }
 }
+
+/* Sombra del tallo (tulipán): aparece cuando ya creció */
+.stem-shade { opacity: 0; }
+.open .stem-shade { animation: fadeIn 1.2s ease-out 2.8s forwards; }

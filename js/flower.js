@@ -133,18 +133,29 @@
            `C${f(W * 1.12)},${f(-L * .66)} ${f(W)},${f(-L * .14)} 0,0Z`;
   }
 
-  // Un pétalo completo: forma, sombra en la base, brillo interior y nervaduras.
-  function tulipPetal(angle, L, W, bend, fill, delay, shiftX) {
+  // Un pétalo completo, con sombreado para dar volumen:
+  //  - cast: proyecta una sombra suave sobre los pétalos que tiene detrás
+  //  - occ:  se oscurece hacia la base (queda tapado por los pétalos delanteros)
+  function tulipPetal(angle, L, W, bend, fill, delay, shiftX, opts) {
+    const o = opts || {};
     const d = tulipPetalPath(L, W, bend);
     const veins =
       `M0,-14 Q${f(bend * .5)},${f(-L * .5)} ${f(bend * .9)},${f(-L * .9)} ` +
       `M${f(-W * .42)},-18 Q${f(-W * .58 + bend * .4)},${f(-L * .5)} ${f(-W * .12 + bend * .8)},${f(-L * .86)} ` +
       `M${f(W * .42)},-18 Q${f(W * .58 + bend * .4)},${f(-L * .5)} ${f(W * .12 + bend * .8)},${f(-L * .86)}`;
+    // Sombra proyectada: trazos anchos y muy transparentes apilados imitan un desenfoque sin usar filtros.
+    const cast = o.cast
+      ? [[12, .03], [7, .045], [3.5, .07]].map(([w, a]) =>
+          `<path d="${d}" fill="none" stroke="#5a2400" stroke-opacity="${a}" stroke-width="${w}" stroke-linejoin="round"/>`).join('')
+      : '';
     return `<g transform="translate(${shiftX || 0},0)">` +
       `<g class="tp" style="--a:${angle}deg;--d:${delay}s">` +
+        cast +
         `<path d="${d}" fill="${fill}" stroke="rgba(160,90,0,.3)" stroke-width="1"/>` +
         `<path d="${d}" fill="url(#tS)"/>` +
+        (o.occ ? `<path d="${d}" fill="url(#tOcc)"/>` : '') +
         `<path d="${tulipPetalPath(L * .84, W * .42, bend * .6)}" fill="#fff8cc" opacity=".3" transform="translate(${f(bend * .08)},-8)"/>` +
+        `<path d="${d}" fill="url(#tSide)"/>` +
         `<path d="${veins}" fill="none" stroke="rgba(150,80,0,.22)" stroke-width="1" stroke-linecap="round"/>` +
       `</g></g>`;
   }
@@ -153,16 +164,24 @@
   // Hoja larga y arqueada que sale desde la base del tallo.
   const TUL_LEAF = 'M0,0 C34,-60 70,-170 92,-268 C30,-190 -8,-80 0,0Z';
   const TUL_LEAF_VEIN = 'M3,-6 C32,-92 62,-190 88,-260';
+  // Mitad de la hoja a un lado del nervio central: da el efecto de hoja doblada.
+  const TUL_LEAF_SHADE = 'M0,0 C34,-60 70,-170 92,-268 L88,-260 C62,-190 32,-92 3,-6 Z';
   function tulipLeaf(t, angle, flip, size, cls, delay) {
     const [x, y] = bez(TUL_P, t);
     return `<g transform="translate(${f(x)},${f(y)}) rotate(${angle}) scale(${f(flip * size)},${f(size)})">` +
       `<g class="grow" style="--d:${delay}s"><g class="leaf ${cls}">` +
         `<path d="${TUL_LEAF}" fill="url(#leafG)" stroke="rgba(30,70,20,.35)" stroke-width="1"/>` +
+        `<path d="${TUL_LEAF_SHADE}" fill="rgba(12,50,8,.3)"/>` +
         `<path d="${TUL_LEAF_VEIN}" stroke="rgba(230,255,190,.4)" stroke-width="1.4" fill="none" stroke-linecap="round"/>` +
       `</g></g></g>`;
   }
 
   function tulip() {
+    // Tramo alto del tallo (donde cae la sombra de la flor), siguiendo su curva.
+    const stemTop = [.78, .84, .9, .95, 1].map((t, i) => {
+      const [x, y] = bez(TUL_P, t);
+      return (i ? 'L' : 'M') + f(x) + ',' + f(y);
+    }).join(' ');
     return `<defs>${COMMON_DEFS}
         <linearGradient id="tB" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-180">
           <stop offset="0" stop-color="#cf8300"/><stop offset=".5" stop-color="#efae14"/><stop offset="1" stop-color="#ffd24d"/>
@@ -177,20 +196,39 @@
         <linearGradient id="tS" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="-120">
           <stop offset="0" stop-color="#8a3c00" stop-opacity=".4"/><stop offset="1" stop-color="#8a3c00" stop-opacity="0"/>
         </linearGradient>
+        <!-- Volumen curvo: sombra a la izquierda, luz cálida del sol a la derecha -->
+        <linearGradient id="tSide" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#6e2a00" stop-opacity=".5"/>
+          <stop offset=".28" stop-color="#6e2a00" stop-opacity=".14"/>
+          <stop offset=".55" stop-color="#fff6c0" stop-opacity=".14"/>
+          <stop offset=".86" stop-color="#fffbd6" stop-opacity=".32"/>
+          <stop offset="1" stop-color="#ffe9a0" stop-opacity=".08"/>
+        </linearGradient>
+        <!-- Oclusión: más oscuro hacia la base, donde los pétalos se tapan entre sí -->
+        <radialGradient id="tOcc" cx=".5" cy="1" r=".78">
+          <stop offset="0" stop-color="#5c2200" stop-opacity=".6"/>
+          <stop offset=".6" stop-color="#5c2200" stop-opacity=".2"/>
+          <stop offset="1" stop-color="#5c2200" stop-opacity="0"/>
+        </radialGradient>
+        <!-- Sombra de la flor sobre la parte alta del tallo -->
+        <linearGradient id="tStemSh" gradientUnits="userSpaceOnUse" x1="0" y1="300" x2="0" y2="372">
+          <stop offset="0" stop-color="#173010" stop-opacity=".7"/><stop offset="1" stop-color="#173010" stop-opacity="0"/>
+        </linearGradient>
       </defs>
       <g class="plant">
         <path class="stem" pathLength="1" fill="none" stroke="url(#stemG)" stroke-width="10" stroke-linecap="round"
               d="M${TUL_P[0]} C${TUL_P[1]} ${TUL_P[2]} ${TUL_P[3]}"/>
         ${tulipLeaf(.06, -10, -1, .92, 'l1', 1.5)}
         ${tulipLeaf(.10, 7, 1, 1, 'l2', 1.8)}
+        <path class="stem-shade" fill="none" stroke="url(#tStemSh)" stroke-width="10" d="${stemTop}"/>
         <g transform="translate(200,300)">
           <circle class="glow" cy="-100" r="205" fill="url(#glowG)"/>
           <g class="head">
-            ${tulipPetal(-27, 178, 50, 24, 'url(#tB)', 2.3)}
-            ${tulipPetal(27, 178, 50, -24, 'url(#tB)', 2.5)}
-            ${tulipPetal(0, 206, 56, 0, 'url(#tC)', 2.7)}
-            ${tulipPetal(-9, 192, 50, 18, 'url(#tF)', 3.0, -25)}
-            ${tulipPetal(9, 192, 50, -18, 'url(#tF)', 3.2, 25)}
+            ${tulipPetal(-27, 178, 50, 24, 'url(#tB)', 2.3, 0, { occ: true })}
+            ${tulipPetal(27, 178, 50, -24, 'url(#tB)', 2.5, 0, { occ: true })}
+            ${tulipPetal(0, 206, 56, 0, 'url(#tC)', 2.7, 0, { occ: true, cast: true })}
+            ${tulipPetal(-9, 192, 50, 18, 'url(#tF)', 3.0, -25, { cast: true })}
+            ${tulipPetal(9, 192, 50, -18, 'url(#tF)', 3.2, 25, { cast: true })}
           </g>
         </g>
       </g>`;
