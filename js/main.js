@@ -7,18 +7,13 @@
   // ---- Fecha de inicio del contador (hora local de quien abre la página) ----
   const START = new Date(2025, 7, 7, 0, 0, 0); // 7 de agosto de 2025
 
+  // Tiempo transcurrido en días totales, horas, minutos y segundos.
   function elapsed(from, to) {
-    let y = to.getFullYear() - from.getFullYear();
-    let cur = new Date(from); cur.setFullYear(from.getFullYear() + y);
-    if (cur > to) { y--; cur = new Date(from); cur.setFullYear(from.getFullYear() + y); }
-    let m = (to.getFullYear() - cur.getFullYear()) * 12 + to.getMonth() - cur.getMonth();
-    let c2 = new Date(cur); c2.setMonth(cur.getMonth() + m);
-    if (c2 > to) { m--; c2 = new Date(cur); c2.setMonth(cur.getMonth() + m); }
-    let rest = Math.max(0, to - c2);
+    let rest = Math.max(0, to - from);
     const d = Math.floor(rest / 864e5); rest -= d * 864e5;
     const h = Math.floor(rest / 36e5);  rest -= h * 36e5;
     const mi = Math.floor(rest / 6e4);  rest -= mi * 6e4;
-    return { y, m, d, h, mi, s: Math.floor(rest / 1000) };
+    return { d, h, mi, s: Math.floor(rest / 1000) };
   }
 
   const cache = {};
@@ -29,8 +24,6 @@
 
   function tick() {
     const t = elapsed(START, new Date());
-    put('t-y', t.y);  put('l-y', t.y === 1 ? 'año' : 'años');
-    put('t-mo', t.m); put('l-mo', t.m === 1 ? 'mes' : 'meses');
     put('t-d', t.d);  put('l-d', t.d === 1 ? 'día' : 'días');
     put('t-h', pad(t.h)); put('t-mi', pad(t.mi)); put('t-s', pad(t.s));
   }
